@@ -1,0 +1,6 @@
+ivan_ivanovich: Hello;
+ivan_ivanovich: Test;
+petr: Message;
+ivan: Hello;
+ivan: How are you?;
+petr: Very good;
