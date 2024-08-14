@@ -54,9 +54,6 @@ public class ServerGUI extends JFrame implements ServerView {
         setVisible(true);
     }
 
-    public Server getConnection(){
-        return server;
-    }
 
     @Override
     public void showMessage(String message) {
