@@ -4,3 +4,7 @@ petr: Message;
 ivan: Hello;
 ivan: How are you?;
 petr: Very good;
+ivan_ivanovich: This is chat again work
+
+petr_petrovich: Yes, that is cool
+

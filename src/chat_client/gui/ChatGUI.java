@@ -1,6 +1,6 @@
-package chat_client;
+package chat_client.gui;
 
-import server.ServerGUI;
+import chat_client.client.ChatClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class ChatGUI extends JFrame {
+public class ChatGUI extends JFrame implements ChatView {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 400;
 
@@ -28,14 +28,11 @@ public class ChatGUI extends JFrame {
     private final JTextField message = new JTextField("Message");
     private final JButton btnSend = new JButton("Send");
 
-    private boolean connected;
-    private String nickname;
 
-    public ServerGUI server;
+    private ChatClient chatClient;
 
-    public ChatGUI(ServerGUI server) {
-        this.server = server;
 
+    public ChatGUI() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setSize(WIDTH, HEIGHT);
@@ -45,7 +42,7 @@ public class ChatGUI extends JFrame {
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                connectedToServer();
+                login();
             }
         });
         panelTop.add(serverIPadress);
@@ -63,14 +60,14 @@ public class ChatGUI extends JFrame {
             @Override
             public void keyTyped(KeyEvent e) {
                 if (e.getKeyChar() == '\n'){
-                    sendMessage();
+                    message();
                 }
             }
         });
         btnSend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sendMessage();
+                message();
             }
         });
         panelBottom.add(message, textFieldConstraints);
@@ -81,51 +78,41 @@ public class ChatGUI extends JFrame {
 
     }
 
-    private void connectedToServer() {
-        if (server.connectedClient(this)) {
-            appendLog("Вы успешно подключились!\n");
-            panelTop.setVisible(false);
-            connected = true;
-            nickname = login.getText();
-            String log = server.getLog();
-            if (log != null){
-                appendLog(log);
-            } else {
-                appendLog("Подключение не удалось");
-            }
-        }
-    }
-
-    public void disconnectFromServer() {
-        if (connected) {
-            panelTop.setVisible(true);
-            connected = false;
-            server.disconnectedClient(this);
-            appendLog("Вы были отключены от сервера!");
-        }
-    }
 
 
     private void appendLog(String text){
         chatArea.append(text + "\n");
     }
 
-    public void answer(String text){
-        appendLog(text);
+
+
+    @Override
+    public void showMessage(String message) {
+        chatArea.append(message);
     }
 
-    public void sendMessage() {
-        if (connected) {
-            String text = message.getText();
-            if (!text.equals("")) {
-                server.messageSending(nickname + ": " + text);
-//                message.setText("");
-            }
-        } else {
-            appendLog("Нет подключения к серверу");
+    @Override
+    public void disconnectedFromServer() {
+        panelTop.setVisible(true);
+    }
+
+    public void disconnectFromServer(){
+        chatClient.disconnectFromServer();
+    }
+
+    public void login(){
+        if (chatClient.connectedToServer(login.getText())){
+            panelTop.setVisible(false);
         }
     }
 
+    private void message(){
+        chatClient.sendMessage(message.getText());
+        message.setText("");
+    }
 
-
+    @Override
+    public void setChat(ChatClient chatClient) {
+        this.chatClient = chatClient;
+    }
 }
